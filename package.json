@@ -1,0 +1,11 @@
+{
+  "name": "wordsby-components",
+  "version": "0.0.1",
+  "description": "Components for wordsby",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tyler Barnes <tyler@known.design>",
+  "license": "MIT"
+}
