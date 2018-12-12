@@ -15,10 +15,15 @@
 // This component will take an url, a success function, a failure function, a loaded function, css, children, a redirectonfinish prop, a next PsychicWindow ref to start a hidden PsychicWindow in place of this one, and the option to run in a fullscreen modal after the iframe has loaded.
 
 import React, { Component } from "react";
-import postRobot from "post-robot";
 import Url from "url-parse";
 
 let robot = false;
+let postRobot;
+if (typeof window !== `undefined`) {
+  postRobot = require("post-robot");
+} else {
+  postRobot = false;
+}
 
 export default class PsychicWindow extends Component {
   constructor(props) {
@@ -27,13 +32,15 @@ export default class PsychicWindow extends Component {
     this.iframe = React.createRef();
     this.loading = React.createRef();
 
-    if (robot.cancel) {
+    if (!!postRobot && robot.cancel) {
       robot.cancel();
     }
 
     this.url = new Url(this.props.url);
 
     this.updateIframe = () => {
+      if (!postRobot) return;
+
       postRobot
         .send(
           this.iframe,
