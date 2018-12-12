@@ -1,24 +1,25 @@
-import React from 'react'
-import Img from 'gatsby-image'
+import React from "react";
+import Img from "gatsby-image";
 
 const Wimg = ({ field, ...props }) => {
   if (!field) {
-    return null
+    return null;
   }
 
-  const { localFile: file } = field
+  const { localFile: file } = field;
 
-  if (typeof field === 'string') {
-    return <img src={field} {...props} />
+  if (typeof field === "string") {
+    return <img src={field} {...props} />;
   } else if (!!file && file.childImageSharp) {
     if (file.childImageSharp.fluid) {
-      return <Img fluid={file.childImageSharp.fluid} {...props} />
+      return <Img fluid={file.childImageSharp.fluid} {...props} />;
     } else if (file.childImageSharp.fixed) {
-      return <Img fixed={file.childImageSharp.fixed} {...props} />
+      return <Img fixed={file.childImageSharp.fixed} {...props} />;
     }
   } else {
-    return null
+    throw `Wordsby Image requires a src url or a field containing a valid childImageSharp query`;
+    return null;
   }
-}
+};
 
-export default Wimg
+export default Wimg;
