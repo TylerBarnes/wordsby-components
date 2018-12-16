@@ -26,7 +26,13 @@ class Wimg extends Component {
       return null;
     }
 
-    const { localFile: file } = field;
+    let file;
+
+    if (!!field.localFile) {
+      file = field.localFile;
+    } else {
+      file = field;
+    }
 
     const useStringUrl = typeof field === "string";
     const useNestedStringUrl = !!field.url && typeof field.url === "string";
