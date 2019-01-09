@@ -39,10 +39,11 @@ class Wimg extends Component {
 
     if (useStringUrl || useNestedStringUrl) {
       const stringUrl = useStringUrl ? field : field.url;
+      const { style } = this.props;
       return (
         <div
-          className="gatsby-image-wrapper"
-          style={{ position: "relative", overflow: "hidden" }}
+          className="gatsby-image-wrapper wordsby-image-preview"
+          style={{ position: "relative", overflow: "hidden", ...style }}
         >
           <div
             style={{
