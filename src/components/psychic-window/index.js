@@ -30,7 +30,16 @@ export default class PsychicWindow extends Component {
     super(props);
 
     this.iframe = React.createRef();
+    this.iframeWrapper = React.createRef();
     this.loading = React.createRef();
+    this.wait = this.props.wait ? this.props.wait : 0;
+    this.scrollUpOffset = this.props.scrollUpOffset
+      ? this.props.scrollUpOffset
+      : 0;
+
+    this.state = {
+      navigated: false
+    };
 
     if (!!postRobot && robot.cancel) {
       robot.cancel();
@@ -39,7 +48,16 @@ export default class PsychicWindow extends Component {
     this.url = new Url(this.props.url);
 
     this.updateIframe = () => {
-      if (!postRobot) return;
+      if (!postRobot || typeof window === "undefined") return;
+
+      if (!!this.state.navigated && this.props.scrollUp) {
+        const scrollTopDistance =
+          this.iframeWrapper.getBoundingClientRect().top +
+          document.documentElement.scrollTop +
+          this.scrollUpOffset;
+
+        window.scrollTo(0, scrollTopDistance);
+      }
 
       postRobot
         .send(
@@ -51,9 +69,22 @@ export default class PsychicWindow extends Component {
           { domain: this.url.origin }
         )
         .then(event => {
-          this.loading.style.display = "none";
-          this.iframe.style.height = `${event.data.height}px`;
+          this.setState({ navigated: true });
+
+          setTimeout(() => {
+            this.loading.style.display = "none";
+            this.iframe.style.display = "unset";
+            this.iframe.style.height = `${event.data.height}px`;
+          }, this.wait);
         });
+
+      // postRobot.on(
+      //   `iframeWindowOnload${this.url.pathname}`,
+      //   ({ data: { height } }) => {
+      //     this.loading.style.display = "none";
+      //     this.iframe.style.height = `${event.data.height}px`;
+      //   }
+      // );
     };
   }
 
@@ -63,23 +94,52 @@ export default class PsychicWindow extends Component {
 
   componentDidMount() {
     this.iframe.onload = () => this.updateIframe();
+
+    // console.log(`Parent: ${this.url.pathname}`);
+
+    postRobot.on(
+      `iframeHeightWillChange${this.url.pathname}`,
+      ({ data: { height } }) => {
+        // console.log(`Parent: ready for height change.`);
+        if (!!this.iframe && !!this.iframeWrapper) {
+          this.iframeWrapper.style.height = this.iframe.style.height;
+          this.iframe.style.height = null;
+        }
+      }
+    );
+
+    postRobot.on(
+      `iframeHeightChanged${this.url.pathname}`,
+      ({ data: { height } }) => {
+        // console.log(
+        //   `Parent: got iframe height on change. Should be ${height}px`
+        // );
+        if (!!this.iframe && !!this.iframeWrapper && !!height) {
+          this.iframe.style.height = `${height}px`;
+          this.iframeWrapper.style.height = `${height}px`;
+        }
+      }
+    );
   }
 
   render() {
     return (
-      <section>
+      <section ref={n => (this.iframeWrapper = n)}>
         <iframe
+          scrolling="no"
           ref={r => (this.iframe = r)}
           src={this.props.url}
           title={this.props.url}
           style={{
             border: "none",
+            display: "none",
             width: "100%",
             height: 0,
             overflowY: "hidden"
           }}
         />
         <div className="loading" ref={r => (this.loading = r)}>
+          loading
           {this.props.children}
         </div>
       </section>
