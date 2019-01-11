@@ -139,7 +139,6 @@ export default class PsychicWindow extends Component {
           }}
         />
         <div className="loading" ref={r => (this.loading = r)}>
-          loading
           {this.props.children}
         </div>
       </section>
