@@ -100,7 +100,7 @@ export default class PsychicWindow extends Component {
 
   render() {
     return (
-
+      <>
         <iframe
           scrolling="no"
           ref={r => (this.iframe = r)}
@@ -126,7 +126,7 @@ export default class PsychicWindow extends Component {
         >
           {this.props.children}
         </div>
-
+      </>
     );
   }
 }
