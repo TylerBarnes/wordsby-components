@@ -30,7 +30,6 @@ export default class PsychicWindow extends Component {
     super(props);
 
     this.iframe = React.createRef();
-    this.iframeWrapper = React.createRef();
     this.loading = React.createRef();
     this.wait = this.props.wait ? this.props.wait : 0;
     this.scrollUpOffset = this.props.scrollUpOffset
@@ -52,7 +51,7 @@ export default class PsychicWindow extends Component {
 
       if (!!this.state.navigated && this.props.scrollUp) {
         const scrollTopDistance =
-          this.iframeWrapper.getBoundingClientRect().top +
+          this.iframe.getBoundingClientRect().top +
           document.documentElement.scrollTop +
           this.scrollUpOffset;
 
@@ -68,23 +67,9 @@ export default class PsychicWindow extends Component {
           },
           { domain: this.url.origin }
         )
-        .then(event => {
+        .then(() => {
           this.setState({ navigated: true });
-
-          setTimeout(() => {
-            this.loading.style.display = "none";
-            this.iframe.style.display = "unset";
-            this.iframe.style.height = `${event.data.height}px`;
-          }, this.wait);
         });
-
-      // postRobot.on(
-      //   `iframeWindowOnload${this.url.pathname}`,
-      //   ({ data: { height } }) => {
-      //     this.loading.style.display = "none";
-      //     this.iframe.style.height = `${event.data.height}px`;
-      //   }
-      // );
     };
   }
 
@@ -95,36 +80,27 @@ export default class PsychicWindow extends Component {
   componentDidMount() {
     this.iframe.onload = () => this.updateIframe();
 
-    // console.log(`Parent: ${this.url.pathname}`);
-
-    postRobot.on(
-      `iframeHeightWillChange${this.url.pathname}`,
-      ({ data: { height } }) => {
-        // console.log(`Parent: ready for height change.`);
-        if (!!this.iframe && !!this.iframeWrapper) {
-          this.iframeWrapper.style.height = this.iframe.style.height;
-          this.iframe.style.height = null;
-        }
-      }
-    );
-
     postRobot.on(
       `iframeHeightChanged${this.url.pathname}`,
       ({ data: { height } }) => {
-        // console.log(
-        //   `Parent: got iframe height on change. Should be ${height}px`
-        // );
-        if (!!this.iframe && !!this.iframeWrapper && !!height) {
-          this.iframe.style.height = `${height}px`;
-          this.iframeWrapper.style.height = `${height}px`;
-        }
+        setTimeout(() => {
+          this.loading.style.opacity = 0;
+          setTimeout(() => {
+            this.iframe.style.display = "unset";
+            setTimeout(() => {
+              this.loading.style.display = "none";
+              this.iframe.style.height = `${height}px`;
+              this.iframe.style.opacity = 1;
+            }, 100);
+          }, 200);
+        }, this.wait);
       }
     );
   }
 
   render() {
     return (
-      <section ref={n => (this.iframeWrapper = n)}>
+
         <iframe
           scrolling="no"
           ref={r => (this.iframe = r)}
@@ -135,13 +111,22 @@ export default class PsychicWindow extends Component {
             display: "none",
             width: "100%",
             height: 0,
-            overflowY: "hidden"
+            overflowY: "hidden",
+            opacity: 0,
+            transition: "opacity .25s ease-in"
           }}
         />
-        <div className="loading" ref={r => (this.loading = r)}>
+        <div
+          className="loading"
+          ref={r => (this.loading = r)}
+          style={{
+            transition: "opacity .1s ease",
+            opacity: 1
+          }}
+        >
           {this.props.children}
         </div>
-      </section>
+
     );
   }
 }
