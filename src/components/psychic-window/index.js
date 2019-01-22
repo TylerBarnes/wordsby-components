@@ -108,7 +108,6 @@ export default class PsychicWindow extends Component {
           title={this.props.url}
           style={{
             border: "none",
-            display: "none",
             width: "100%",
             height: 0,
             overflowY: "hidden",
