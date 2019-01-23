@@ -29,6 +29,7 @@ export default class PsychicWindow extends Component {
   constructor(props) {
     super(props);
 
+    this.listener = false;
     this.iframe = React.createRef();
     this.loading = React.createRef();
     this.wait = this.props.wait ? this.props.wait : 0;
@@ -80,22 +81,30 @@ export default class PsychicWindow extends Component {
   componentDidMount() {
     this.iframe.onload = () => this.updateIframe();
 
-    postRobot.on(
-      `iframeHeightChanged${this.url.pathname}`,
-      ({ data: { height } }) => {
-        setTimeout(() => {
-          this.loading.style.opacity = 0;
+    if (!this.listener) {
+      this.listener = postRobot.on(
+        `iframeHeightChanged${this.url.pathname}`,
+        ({ data: { height } }) => {
           setTimeout(() => {
-            this.iframe.style.display = "unset";
+            this.loading.style.opacity = 0;
             setTimeout(() => {
-              this.loading.style.display = "none";
-              this.iframe.style.height = `${height}px`;
-              this.iframe.style.opacity = 1;
-            }, 100);
-          }, 200);
-        }, this.wait);
-      }
-    );
+              this.iframe.style.display = "unset";
+              setTimeout(() => {
+                this.loading.style.display = "none";
+                this.iframe.style.height = `${height}px`;
+                this.iframe.style.opacity = 1;
+              }, 100);
+            }, 200);
+          }, this.wait);
+        }
+      );
+    }
+  }
+
+  componentWillUnmount() {
+    if (!!this.listener) {
+      this.listener.cancel();
+    }
   }
 
   render() {
