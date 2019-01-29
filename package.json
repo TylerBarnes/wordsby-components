@@ -1,6 +1,6 @@
 {
   "name": "wordsby-components",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Components for wordsby",
   "main": "index.js",
   "author": "Tyler Barnes <tyler@known.design>",
@@ -9,8 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "copy-npm-files": "cp -rf package.json ./lib/ && cp -rf readme.md ./lib/",
     "clean-lib": "node_modules/.bin/rimraf ./lib",
-    "build": "rm -rf src/package.json src/node_modules src/yarn.lock || true && yarn clean-lib && babel src --out-dir lib --ignore __tests__ && yarn copy-npm-files",
-    "watch": "npm run clean-lib && mkdir lib && npm run copy-npm-files && babel -w src --out-dir lib --ignore __tests__"
+    "build": "rm -rf src/package.json src/node_modules src/yarn.lock || true && babel src --out-dir lib --ignore __tests__ && yarn copy-npm-files",
+    "watch": "mkdir lib || true && npm run copy-npm-files && babel -w src --out-dir lib --ignore __tests__"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
