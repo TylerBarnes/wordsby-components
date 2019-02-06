@@ -1,6 +1,6 @@
 {
   "name": "wordsby-components",
-  "version": "0.0.26",
+  "version": "0.0.28",
   "description": "Components for wordsby",
   "main": "index.js",
   "author": "Tyler Barnes <tyler@known.design>",

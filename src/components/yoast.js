@@ -34,19 +34,21 @@ const Yoast = ({ ...yoast }) => {
   return (
     <Helmet>
       {/* SEO title */}
-      {seo_title !== "" && <title>{seo_title}</title>}
+      {!!seo_title && seo_title !== "" && <title>{seo_title}</title>}
 
       {/* SEO meta description */}
-      {seo_metadesc !== "" && (
+      {!!seo_metadesc && seo_metadesc !== "" && (
         <meta name="description" content={seo_metadesc} />
       )}
 
       {/* Canonical url */}
-      {canonical_url !== "" && <link rel="canonical" href={canonical_url} />}
+      {!!canonical_url && canonical_url !== "" && (
+        <link rel="canonical" href={canonical_url} />
+      )}
 
       {/* OG Site type */}
       <meta property="og:type" content="website" />
-      {og_description !== "" && (
+      {!!og_description && og_description !== "" && (
         <meta
           property="og:description"
           content={og_description ? og_description : seo_metadesc}
@@ -54,9 +56,13 @@ const Yoast = ({ ...yoast }) => {
       )}
 
       {/* OG image */}
-      {!!og_image && !!og_image.publicURL && !!origin && (
-        <meta property="og:image" content={origin + og_image.publicURL} />
-      )}
+      {!!og_image &&
+        !!og_image.publicURL &&
+        !!origin &&
+        typeof origin === "string" &&
+        typeof og_image.publicUrl === "string" && (
+          <meta property="og:image" content={origin + og_image.publicURL} />
+        )}
 
       {/* OG site name */}
       {!!siteName && <meta property="og:site_name" content={siteName} />}
@@ -65,8 +71,11 @@ const Yoast = ({ ...yoast }) => {
       {!!currentUrl && <meta property="og:url" content={currentUrl} />}
 
       {/* OG title (same as SEO title) */}
-      {og_title !== "" && (
-        <meta property="og:title" content={og_title ? og_title : seo_title} />
+      {!!og_title && og_title !== "" && (
+        <meta
+          property="og:title"
+          content={og_title ? og_title : seo_title || null}
+        />
       )}
 
       {/* twitter */}
@@ -78,7 +87,7 @@ const Yoast = ({ ...yoast }) => {
       )}
 
       {/* Twitter title = og title or seo title */}
-      {og_title !== "" && (
+      {!!og_title && og_title !== "" && (
         <meta
           property="twitter:title"
           content={og_title ? og_title : seo_title}
