@@ -25,7 +25,7 @@ if (typeof window !== `undefined`) {
   postRobot = false;
 }
 
-export default class PsychicWindow extends Component {
+class PsychicWindow extends Component {
   constructor(props) {
     super(props);
 
@@ -81,7 +81,7 @@ export default class PsychicWindow extends Component {
   componentDidMount() {
     this.iframe.onload = () => this.updateIframe();
 
-    if (!this.listener) {
+    if (!this.listener && !!postRobot) {
       this.listener = postRobot.on(
         `iframeHeightChanged${this.url.pathname}`,
         ({ data: { height } }) => {
@@ -138,3 +138,11 @@ export default class PsychicWindow extends Component {
     );
   }
 }
+
+export default props => {
+  if (!postRobot) {
+    return null;
+  } else {
+    <PsychicWindow {...props} />;
+  }
+};
