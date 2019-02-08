@@ -25,7 +25,7 @@ if (typeof window !== `undefined`) {
   postRobot = false;
 }
 
-class PsychicWindow extends Component {
+export default class PsychicWindow extends Component {
   constructor(props) {
     super(props);
 
@@ -68,7 +68,15 @@ class PsychicWindow extends Component {
           },
           { domain: this.url.origin }
         )
-        .then(() => {
+        .then(({ data: { url } }) => {
+          const args = { url, iframe: this.iframe };
+
+          if (this.props.onNavigate && this.state.navigated) {
+            this.props.onNavigate(args);
+          } else if (this.props.onLoad && !this.state.navigated) {
+            this.props.onLoad(args);
+          }
+
           this.setState({ navigated: true });
         });
     };
@@ -89,12 +97,10 @@ class PsychicWindow extends Component {
             this.loading.style.opacity = 0;
             setTimeout(() => {
               this.iframe.style.display = "unset";
-              setTimeout(() => {
-                this.loading.style.display = "none";
-                this.iframe.style.height = `${height}px`;
-                this.iframe.style.opacity = 1;
-              }, 100);
-            }, 200);
+              this.loading.style.display = "none";
+              this.iframe.style.height = `${height}px`;
+              this.iframe.style.opacity = 1;
+            }, 300);
           }, this.wait);
         }
       );
@@ -102,12 +108,14 @@ class PsychicWindow extends Component {
   }
 
   componentWillUnmount() {
-    if (!!this.listener) {
+    if (!!this.listener && !!postRobot) {
       this.listener.cancel();
     }
   }
 
   render() {
+    if (typeof window === `undefined`) return this.props.children;
+
     return (
       <>
         <iframe
@@ -138,11 +146,3 @@ class PsychicWindow extends Component {
     );
   }
 }
-
-export default props => {
-  if (!postRobot) {
-    return null;
-  } else {
-    <PsychicWindow {...props} />;
-  }
-};
